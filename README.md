@@ -19,8 +19,7 @@
 
 ## Enlaces Principales de Evaluación
 
-* **Despliegue Funcional en la Nube (Swagger UI / OpenAPI):** `http://localhost:8000/docs` *(o URL de producción asignada)*
-
+* **Despliegue Funcional en la Nube (Swagger UI / OpenAPI):** [https://ferremax-api.onrender.com/docs](https://ferremax-api.onrender.com/docs)
 ---
 
 ## Descripción del Proyecto
@@ -90,3 +89,9 @@ El sistema mantiene correspondencia bidireccional directa entre las definiciones
 * **ADR-002:** Desacoplamiento de almacenamiento mediante *Repository Pattern* y garantía de atomicidad transaccional con *Unit of Work*.
 
 * **ADR-003:** Segregación de operaciones de lectura y escritura (*CQRS básico*) para optimizar consultas de inventario multi-sucursal sin comprometer el modelo transaccional.
+
+## Ejecución de la API 
+- Local: ver docs/api/DESPLIEGUE.md sección 1
+- Docker: cp .env.example .env && docker compose up --build  → http://localhost:8000/docs
+- Pruebas: pytest
+- Producción (Render): https://ferremax-api.onrender.com/docs
