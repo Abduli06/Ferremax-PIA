@@ -1,0 +1,1094 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FerreMax API",
+    "description": "API REST de FerreMax (PIA Componentes de Lógica de Negocio).\n\nFlujo: `CREADO → APROBADO → SURTIDO → ENTREGADO`; cancelación: `CREADO → CANCELADO`.\n\nErrores: **400** solicitud mal formada · **404** no encontrado · **409** conflicto de estado/stock · **422** regla de negocio violada.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaludOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones": {
+      "get": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Consultar operaciones",
+        "operationId": "listar_operaciones_operaciones_get",
+        "parameters": [
+          {
+            "name": "estado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(CREADO|APROBADO|SURTIDO|ENTREGADO|CANCELADO)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "name": "actor_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Actor Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaOperacionesOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud mal formada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Crear operación",
+        "operationId": "crear_operacion_operaciones_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrearOperacionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud mal formada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Regla de negocio violada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}": {
+      "get": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Detalle de una operación",
+        "operationId": "obtener_operacion_operaciones__operacion_id__get",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/evaluacion": {
+      "get": {
+        "tags": [
+          "Reglas"
+        ],
+        "summary": "Evaluar Specifications (puede_procesarse / beneficio_referencia)",
+        "operationId": "evaluar_operacion_operaciones__operacion_id__evaluacion_get",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluacionOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/aprobar": {
+      "post": {
+        "tags": [
+          "Estados"
+        ],
+        "summary": "CREADO → APROBADO",
+        "operationId": "aprobar_operaciones__operacion_id__aprobar_post",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado o stock",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Regla de negocio violada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/surtir": {
+      "post": {
+        "tags": [
+          "Estados"
+        ],
+        "summary": "APROBADO → SURTIDO (valida stock)",
+        "operationId": "surtir_operaciones__operacion_id__surtir_post",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado o stock",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Regla de negocio violada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/entregar": {
+      "post": {
+        "tags": [
+          "Estados"
+        ],
+        "summary": "SURTIDO → ENTREGADO",
+        "operationId": "entregar_operaciones__operacion_id__entregar_post",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado o stock",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/cancelar": {
+      "post": {
+        "tags": [
+          "Estados"
+        ],
+        "summary": "CREADO → CANCELADO",
+        "operationId": "cancelar_operaciones__operacion_id__cancelar_post",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelarIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud mal formada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado o stock",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Regla de negocio violada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actores/{actor_id}/credito": {
+      "get": {
+        "tags": [
+          "Actores"
+        ],
+        "summary": "Estado de crédito del actor",
+        "operationId": "credito_actor_actores__actor_id__credito_get",
+        "parameters": [
+          {
+            "name": "actor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Actor Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditoOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CancelarIn": {
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "title": "Motivo",
+            "examples": [
+              "El cliente ya no requiere el pedido"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "motivo"
+        ],
+        "title": "CancelarIn"
+      },
+      "CrearOperacionIn": {
+        "properties": {
+          "actor_id": {
+            "type": "string",
+            "title": "Actor Id",
+            "examples": [
+              "FER-C001"
+            ]
+          },
+          "lineas": {
+            "items": {
+              "$ref": "#/components/schemas/LineaIn"
+            },
+            "type": "array",
+            "title": "Lineas"
+          },
+          "promocion_activa": {
+            "type": "boolean",
+            "title": "Promocion Activa",
+            "default": false
+          },
+          "autorizado": {
+            "type": "boolean",
+            "title": "Autorizado",
+            "default": true
+          },
+          "referencia": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referencia"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actor_id"
+        ],
+        "title": "CrearOperacionIn"
+      },
+      "CreditoOut": {
+        "properties": {
+          "actor_id": {
+            "type": "string",
+            "title": "Actor Id"
+          },
+          "activo": {
+            "type": "boolean",
+            "title": "Activo"
+          },
+          "es_preferente": {
+            "type": "boolean",
+            "title": "Es Preferente"
+          },
+          "credito_suspendido": {
+            "type": "boolean",
+            "title": "Credito Suspendido"
+          },
+          "operaciones_abiertas": {
+            "type": "integer",
+            "title": "Operaciones Abiertas"
+          },
+          "monto_abierto": {
+            "type": "string",
+            "title": "Monto Abierto"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actor_id",
+          "activo",
+          "es_preferente",
+          "credito_suspendido",
+          "operaciones_abiertas",
+          "monto_abierto"
+        ],
+        "title": "CreditoOut"
+      },
+      "ErrorOut": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "codigo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo",
+            "description": "Nombre de la excepción de dominio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorOut"
+      },
+      "EvaluacionOut": {
+        "properties": {
+          "operacion_id": {
+            "type": "string",
+            "title": "Operacion Id"
+          },
+          "puede_procesarse": {
+            "type": "boolean",
+            "title": "Puede Procesarse"
+          },
+          "motivos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Motivos"
+          },
+          "beneficio_referencia": {
+            "type": "boolean",
+            "title": "Beneficio Referencia"
+          },
+          "total": {
+            "type": "string",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "operacion_id",
+          "puede_procesarse",
+          "motivos",
+          "beneficio_referencia",
+          "total"
+        ],
+        "title": "EvaluacionOut"
+      },
+      "EventoOut": {
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "ocurrido_en": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Ocurrido En"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nombre",
+          "ocurrido_en"
+        ],
+        "title": "EventoOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LineaIn": {
+        "properties": {
+          "recurso_id": {
+            "type": "string",
+            "title": "Recurso Id",
+            "examples": [
+              "FER-P001"
+            ]
+          },
+          "cantidad": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Cantidad",
+            "examples": [
+              2
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "recurso_id",
+          "cantidad"
+        ],
+        "title": "LineaIn"
+      },
+      "LineaOut": {
+        "properties": {
+          "recurso_id": {
+            "type": "string",
+            "title": "Recurso Id"
+          },
+          "cantidad": {
+            "type": "integer",
+            "title": "Cantidad"
+          },
+          "precio_unitario": {
+            "type": "string",
+            "title": "Precio Unitario"
+          },
+          "subtotal": {
+            "type": "string",
+            "title": "Subtotal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recurso_id",
+          "cantidad",
+          "precio_unitario",
+          "subtotal"
+        ],
+        "title": "LineaOut"
+      },
+      "ListaOperacionesOut": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OperacionResumen"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "items"
+        ],
+        "title": "ListaOperacionesOut"
+      },
+      "OperacionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "actor_id": {
+            "type": "string",
+            "title": "Actor Id"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "total": {
+            "type": "string",
+            "title": "Total"
+          },
+          "unidades": {
+            "type": "integer",
+            "title": "Unidades"
+          },
+          "fecha_solicitud": {
+            "type": "string",
+            "title": "Fecha Solicitud"
+          },
+          "referencia": {
+            "type": "string",
+            "title": "Referencia"
+          },
+          "promocion_activa": {
+            "type": "boolean",
+            "title": "Promocion Activa"
+          },
+          "autorizado": {
+            "type": "boolean",
+            "title": "Autorizado"
+          },
+          "motivo_cancelacion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Cancelacion"
+          },
+          "lineas": {
+            "items": {
+              "$ref": "#/components/schemas/LineaOut"
+            },
+            "type": "array",
+            "title": "Lineas"
+          },
+          "eventos": {
+            "items": {
+              "$ref": "#/components/schemas/EventoOut"
+            },
+            "type": "array",
+            "title": "Eventos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "actor_id",
+          "estado",
+          "total",
+          "unidades",
+          "fecha_solicitud",
+          "referencia",
+          "promocion_activa",
+          "autorizado",
+          "motivo_cancelacion",
+          "lineas",
+          "eventos"
+        ],
+        "title": "OperacionOut",
+        "example": {
+          "actor_id": "FER-C025",
+          "autorizado": true,
+          "estado": "CREADO",
+          "eventos": [],
+          "fecha_solicitud": "2026-10-02",
+          "id": "FER-O001",
+          "lineas": [],
+          "promocion_activa": false,
+          "referencia": "PIA_FER_001",
+          "total": "5150.00",
+          "unidades": 7
+        }
+      },
+      "OperacionResumen": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "actor_id": {
+            "type": "string",
+            "title": "Actor Id"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "total": {
+            "type": "string",
+            "title": "Total"
+          },
+          "unidades": {
+            "type": "integer",
+            "title": "Unidades"
+          },
+          "fecha_solicitud": {
+            "type": "string",
+            "title": "Fecha Solicitud"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "actor_id",
+          "estado",
+          "total",
+          "unidades",
+          "fecha_solicitud"
+        ],
+        "title": "OperacionResumen"
+      },
+      "SaludOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "database": {
+            "type": "string",
+            "title": "Database"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "database",
+          "environment"
+        ],
+        "title": "SaludOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
