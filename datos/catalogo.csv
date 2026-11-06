@@ -1,0 +1,21 @@
+﻿recurso_id,descripcion,precio_mxn,capacidad_o_stock,habilitado
+FER-P001,Taladro 01,612.00,13,1
+FER-P002,Tornillos 02,683.00,16,1
+FER-P003,Pintura 03,754.00,19,1
+FER-P004,Martillo 04,825.00,22,1
+FER-P005,Taladro 05,896.00,25,1
+FER-P006,Tornillos 06,967.00,28,1
+FER-P007,Pintura 07,1038.00,31,1
+FER-P008,Martillo 08,1109.00,34,1
+FER-P009,Taladro 09,1180.00,37,1
+FER-P010,Tornillos 10,1251.00,40,1
+FER-P011,Pintura 11,1322.00,43,0
+FER-P012,Martillo 12,1393.00,46,1
+FER-P013,Taladro 13,1464.00,49,1
+FER-P014,Tornillos 14,1535.00,52,1
+FER-P015,Pintura 15,1606.00,10,1
+FER-P016,Martillo 16,1677.00,13,1
+FER-P017,Taladro 17,1748.00,16,1
+FER-P018,Tornillos 18,1819.00,19,1
+FER-P019,Pintura 19,1890.00,22,1
+FER-P020,Martillo 20,1961.00,25,1
