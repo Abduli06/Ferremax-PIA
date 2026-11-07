@@ -8,7 +8,6 @@ casos_prueba = dominio.get("casos", [])
 transiciones = dominio.get("transiciones", [])
 
 def test_generar_resultados_y_validar_casos():
-    # 1. Verificamos que los datos se hayan cargado al runner
     assert len(casos_prueba) > 0, "Error: No se encontraron los casos de prueba"
     assert len(transiciones) > 0, "Error: No se encontraron las transiciones"
     ruta_resultados = Path("tests/resultados_comprobados.csv")
