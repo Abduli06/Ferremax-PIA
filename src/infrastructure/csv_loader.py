@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 
+
 def cargar_todos_los_csv(ruta_carpeta_datos):
     ruta = Path(ruta_carpeta_datos)
     datos = {}
@@ -19,7 +20,7 @@ def cargar_todos_los_csv(ruta_carpeta_datos):
         datos_archivo = []
         
         if archivo_csv.exists():
-            with open(archivo_csv, mode='r', encoding='utf-8-sig') as f:
+            with open(archivo_csv, encoding='utf-8-sig') as f:
                 lector = csv.DictReader(f)
                 for fila in lector:
                     datos_archivo.append(fila)

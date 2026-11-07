@@ -1,5 +1,6 @@
 from .csv_loader import cargar_todos_los_csv
 
+
 def instanciar_dominio(ruta_carpeta_datos):
     print("Iniciando conexión con el dominio de FerreMax...")
     datos_crudos = cargar_todos_los_csv(ruta_carpeta_datos)
