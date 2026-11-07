@@ -16,9 +16,9 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - run: pip install -r requirements-dev.txt
       - name: Lint (ruff)
-        run: ruff check src tests
+        run: ruff check --fix src tests
       - name: Pruebas + cobertura (mínimo 80%)
-        run: pytest --cov=src --cov-fail-under=80
+        run: python -m pytest --cov=src --cov-fail-under=80
 
   docker:
     runs-on: ubuntu-latest

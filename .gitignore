@@ -1,9 +1,94 @@
-.env
-*.db
-__pycache__/
-*.pyc
+
 .venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+
+# Bytecode y cachés de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+
+# Pruebas y Cobertura (Pytest / Coverage)
 .pytest_cache/
-.ruff_cache/
 .coverage
+.coverage.*
 htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.tox/
+.nox/
+
+
+# Bases de datos locales y temporales
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite3-journal
+
+
+# Variables de entorno y secretos (12-Factor App)
+# Excluir archivos con credenciales reales; conservar plantillas
+.env
+.env.local
+.env.*.local
+!.env.example
+
+
+# Docker y contenedores
+.docker/
+
+
+# Archivos de registro y depuración
+*.log
+logs/
+*.pid
+
+
+# Editores y entornos de desarrollo (IDEs)
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+
+
+# Archivos del Sistema Operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
