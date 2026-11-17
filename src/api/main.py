@@ -3,12 +3,17 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.api.config import Settings
 from src.api.errores import registrar_manejadores
 from src.api.persistencia_temporal import RepositorioSnapshots
 from src.api.rutas import router
 from src.api.servicio import ServicioOperaciones
+
+BASE_DIR = Path(__file__).resolve().parents[2]
+FRONTEND_DIR = BASE_DIR / "frontend"
+IMG_DIR = FRONTEND_DIR / "img"
 
 DESCRIPCION = (
     "API REST de FerreMax (PIA Componentes de Lógica de Negocio).\n\n"
@@ -22,7 +27,6 @@ def crear_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.desde_entorno()
     app = FastAPI(title="FerreMax API", version="1.0.0", description=DESCRIPCION)
 
-    # Habilitar CORS para peticiones locales y externas
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -30,6 +34,10 @@ def crear_app(settings: Settings | None = None) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Garantiza que la carpeta exista siempre antes de montar StaticFiles
+    IMG_DIR.mkdir(parents=True, exist_ok=True)
+    app.mount("/img", StaticFiles(directory=str(IMG_DIR)), name="img")
 
     app.state.settings = settings
     app.state.servicio = ServicioOperaciones(
@@ -44,8 +52,7 @@ def crear_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/app", include_in_schema=False)
     def tienda_comercial():
-        ruta_html = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
-        return FileResponse(ruta_html)
+        return FileResponse(FRONTEND_DIR / "index.html")
 
     return app
 

@@ -515,9 +515,13 @@
                    </span>`
               }
             </div>
-
-            <div class="h-24 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center text-4xl mb-3">
-              ${p.icono}
+            
+            <div class="h-32 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center text-4xl mb-3 overflow-hidden relative">
+                <img src="img/${p.id}.png"
+                alt="${p.nombre}"
+                class="w-full h-full object-contain p-2 hover:scale-105 transition duration-300"
+                onerror="if (!this.dataset.triedJpg) { this.dataset.triedJpg = 'true'; this.src = 'img/${p.id}.jpg'; } else { this.style.display = 'none'; this.nextElementSibling.classList.remove('hidden'); }" />
+                <span class="hidden select-none">${p.icono}</span>
             </div>
 
             <div class="text-[11px] font-bold uppercase text-orange-600">${p.categoria}</div>
