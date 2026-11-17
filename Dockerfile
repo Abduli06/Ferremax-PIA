@@ -5,6 +5,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY src ./src
 COPY datos ./datos
+COPY frontend ./frontend
 
 FROM base AS test
 COPY requirements-dev.txt pyproject.toml ./
