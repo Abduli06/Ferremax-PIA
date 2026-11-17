@@ -288,10 +288,10 @@
                 <th class="py-3 px-4">Folio</th>
                 <th class="py-3 px-4">Cliente</th>
                 <th class="py-3 px-4">Estatus Actual</th>
-                <th class="py-3 px-4 text-right">Artículos</th>
-                <th class="py-3 px-4 text-right">Importe Total</th>
+                <th class="py-3 px-4 text-left">Artículos</th>
+                <th class="py-3 px-4 text-left">Importe Total</th>
                 <th class="py-3 px-4">Fecha</th>
-                <th class="py-3 px-4 text-right">Acción</th>
+                <th class="py-3 px-4 text-left">Acción</th>
               </tr>
             </thead>
             <tbody id="tablaPedidosBody" class="divide-y divide-slate-100"></tbody>
@@ -673,7 +673,7 @@
         CANCELADO: { texto: "Pedido Cancelado", color: "bg-rose-100 text-rose-800 border-rose-200" }
       };
       const cfg = mapa[estado] || { texto: estado, color: "bg-slate-100 text-slate-700 border-slate-200" };
-      return `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${cfg.color}">${cfg.texto}</span>`;
+      return `<span class="inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold border ${cfg.color}">${cfg.texto}</span>`;
     }
 
     async function cargarPedidosTienda() {
@@ -702,13 +702,13 @@
 
         tbody.innerHTML = data.items.map(op => `
           <tr onclick="abrirDetallePedido('${op.id}')" class="hover:bg-orange-50/60 cursor-pointer transition">
-            <td class="py-3 px-4 font-mono font-extrabold text-orange-600">${op.id}</td>
-            <td class="py-3 px-4 font-mono font-semibold text-slate-700">${op.actor_id}</td>
-            <td class="py-3 px-4">${etiquetaEstadoVisual(op.estado)}</td>
-            <td class="py-3 px-4 text-right font-medium">${op.unidades} pzas.</td>
-            <td class="py-3 px-4 text-right font-extrabold text-slate-900">$${op.total}</td>
-            <td class="py-3 px-4 text-slate-500">${op.fecha_solicitud}</td>
-            <td class="py-3 px-4 text-right">
+            <td class="py-3 px-4 font-mono font-extrabold text-orange-600 whitespace-nowrap">${op.id}</td>
+            <td class="py-3 px-4 font-mono font-semibold text-slate-700 whitespace-nowrap">${op.actor_id}</td>
+            <td class="py-3 px-4 whitespace-nowrap">${etiquetaEstadoVisual(op.estado)}</td>
+            <td class="py-3 px-4 text-right font-medium whitespace-nowrap">${op.unidades} pzas.</td>
+            <td class="py-3 px-4 text-left font-extrabold text-slate-900 whitespace-nowrap">$${op.total}</td>
+            <td class="py-3 px-4 text-slate-500 whitespace-nowrap">${op.fecha_solicitud}</td>
+            <td class="py-3 px-4 text-left whitespace-nowrap">
               <span class="text-orange-600 font-bold hover:underline">Ver seguimiento →</span>
             </td>
           </tr>
@@ -722,6 +722,30 @@
       const folio = document.getElementById("buscarFolioDirecto").value.trim();
       if (folio) abrirDetallePedido(folio);
     }
+
+    function formatearFechaLocal(fechaIso) {
+      if (!fechaIso) return "";
+      const texto = String(fechaIso).trim();
+      // Si la fecha viene en UTC sin sufijo Z, se lo agregamos para que el navegador reste las 6 horas
+      const fechaNormalizada = texto.includes("T") && !texto.endsWith("Z") && !texto.includes("+") && !texto.slice(10).includes("-")
+        ? texto + "Z"
+        : texto;
+      const fecha = new Date(fechaNormalizada);
+      if (isNaN(fecha.getTime())) {
+        return texto.slice(0, 19).replace("T", " ");
+      }
+      return fecha.toLocaleString("es-MX", {
+        timeZone: "America/Monterrey",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      });
+    }
+
 
     async function abrirDetallePedido(operacionId) {
       const panel = document.getElementById("contenedorDetallePedido");
@@ -840,7 +864,7 @@
               ${op.eventos.length > 0 ? op.eventos.map(e => `
                 <div class="flex justify-between text-[11px] py-0.5 text-slate-600">
                   <span class="font-semibold text-slate-800">• ${e.nombre}</span>
-                  <span class="font-mono text-slate-400">${String(e.ocurrido_en).slice(0, 19).replace('T', ' ')}</span>
+                  <span class="font-mono text-slate-400">${formatearFechaLocal(e.ocurrido_en)}</span>
                 </div>
               `).join("") : `<span class="text-[11px] text-slate-400 italic">Pedido recién creado, sin movimientos posteriores.</span>`}
             </div>
