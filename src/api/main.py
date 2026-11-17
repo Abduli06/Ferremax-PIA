@@ -54,6 +54,20 @@ def crear_app(settings: Settings | None = None) -> FastAPI:
     def tienda_comercial():
         return FileResponse(FRONTEND_DIR / "index.html")
 
+    @app.api_route("/reset-demo", methods=["GET", "POST"], include_in_schema=False)
+    def reiniciar_datos_demo():
+        repo = RepositorioSnapshots(app.state.settings.database_url)
+        # Si el repositorio usa SQLAlchemy, limpia todas las tablas registradas
+        if hasattr(repo, "_engine"):
+            from sqlalchemy import MetaData
+            meta = MetaData()
+            meta.reflect(bind=repo._engine)
+            with repo._engine.begin() as conn:
+                for tabla in reversed(meta.sorted_tables):
+                    conn.execute(tabla.delete())
+        app.state.servicio = ServicioOperaciones(app.state.settings.data_dir, repo)
+        return {"status": "ok", "mensaje": "Base de datos limpia y restaurada a los 60 pedidos originales"}
+
     return app
 
 
